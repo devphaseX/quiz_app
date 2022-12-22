@@ -49,7 +49,6 @@ const startQuizAction: ActionFunction = async ({ request }) => {
   store.dispatch(resultActions.setUserId({ userId: username }));
 
   await promise.then(() => unsubscribe());
-  console.log(store.getState().result);
   return redirect('/quiz');
 };
 

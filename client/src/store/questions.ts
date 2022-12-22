@@ -5,7 +5,7 @@ const { reducer, actions } = createSlice({
   name: 'questions',
   initialState: {
     questionQueue: <Array<QuestionWithUniqueOption>>[],
-    trace: -1,
+    trace: 0,
     currentAttendingQuestion: <null | QuestionWithUniqueOption>null,
   },
   reducers: {
@@ -13,6 +13,8 @@ const { reducer, actions } = createSlice({
       return {
         ...state,
         questionQueue: action.payload,
+        currentAttendingQuestion: action.payload[0],
+        trace: 0,
       };
     },
   },

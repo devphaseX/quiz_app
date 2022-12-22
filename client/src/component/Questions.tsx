@@ -1,29 +1,26 @@
-import { useMemo } from 'react';
-import { makeQuestionUnique, optionableQuestion } from '../database/data';
-import { useSelector } from 'react-redux';
-import { redirect } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { QuestionWithUniqueOption } from '../database/data';
+import { Dispatch, useEffect } from 'react';
+import { questionActions } from '../store/questions';
 
-const questionsWithUniqueOptions = makeQuestionUnique(optionableQuestion);
+interface QuestionListProps {
+  questions: Array<QuestionWithUniqueOption>;
+}
 
-const Questions = () => {
-  const currentAttendingQuestion = useMemo(
-    () => questionsWithUniqueOptions[0],
-    []
+const Questions = ({ questions }: QuestionListProps) => {
+  const dispatch =
+    useDispatch<Dispatch<ReturnType<typeof questionActions.startQuiz>>>();
+
+  useEffect(() => {
+    dispatch(questionActions.startQuiz(questions));
+  }, []);
+
+  const { currentAttendingQuestion, trace } = useSelector(
+    (state) => (state as GlobalStoreState).questions
   );
 
-  const _question = useSelector<GlobalStoreState>(
-    (state) => state.questions.currentAttendingQuestion
-  );
-
-  if (!_question) {
-    return null;
-  }
-
-  const {
-    id: questionId,
-    question,
-    options: questionOption,
-  } = currentAttendingQuestion;
+  const questionObject = currentAttendingQuestion || questions[trace];
+  const { id: questionId, question, options: questionOption } = questionObject;
 
   const onSelectOption = (answerId: string) => () => {
     console.log(
