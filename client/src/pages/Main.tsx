@@ -1,5 +1,8 @@
 import { ActionFunction, Form, redirect } from 'react-router-dom';
 import '../styles/Main.css';
+import { store } from '../store';
+import { getExternalFulfillPromise } from '../util';
+import { resultActions } from '../store/result';
 
 const INPUT_FORM_NAME = 'username';
 
@@ -36,7 +39,17 @@ const Main = () => {
 const startQuizAction: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const username = formData.get(INPUT_FORM_NAME) as string;
-  console.log({ username });
+
+  const { promise, resolve } = getExternalFulfillPromise<void>();
+
+  const unsubscribe = store.subscribe(() => {
+    if (store.getState().result.userId !== username) return;
+    resolve();
+  });
+  store.dispatch(resultActions.setUserId({ userId: username }));
+
+  await promise.then(() => unsubscribe());
+  console.log(store.getState().result);
   return redirect('/quiz');
 };
 
