@@ -17,6 +17,20 @@ const { reducer, actions } = createSlice({
         trace: 0,
       };
     },
+
+    goToPrev: (state) => {
+      return {
+        ...state,
+        trace: Math.max(state.trace - 1, 0),
+      };
+    },
+
+    goToNext: (state) => {
+      return {
+        ...state,
+        trace: Math.min(state.trace + 1, state.questionQueue.length - 1),
+      };
+    },
   },
 });
 
