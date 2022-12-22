@@ -39,4 +39,5 @@ const { actions, reducer } = createSlice({
   },
 });
 
+export type { AnswerObject, ChoosenAnswerAction };
 export { actions as resultActions, reducer as resultReducer };
