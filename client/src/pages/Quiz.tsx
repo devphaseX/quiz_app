@@ -42,8 +42,9 @@ const QuestionControl = () => {
 
   const { allowNext, allowPrev } = useSelector((state: GlobalStoreState) => ({
     allowPrev: state.questions.trace !== 0,
-    allowNext: state.questions.trace === state.questions.questionQueue.length,
+    allowNext: state.questions.trace < state.questions.questionQueue.length,
   }));
+
   const onRequestPreviousQuiz = () => {
     dispatch(questionActions.goToPrev());
   };
@@ -57,7 +58,7 @@ const QuestionControl = () => {
         type="button"
         onClick={onRequestPreviousQuiz}
         className="btn prev"
-        disabled={allowPrev}
+        disabled={allowPrev === false}
       >
         Prev
       </button>
@@ -65,9 +66,9 @@ const QuestionControl = () => {
         type="button"
         onClick={onRequestNextQuiz}
         className="btn next"
-        disabled={allowNext}
+        disabled={allowNext === false}
       >
-        Prev
+        Next
       </button>
     </div>
   );

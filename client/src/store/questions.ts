@@ -19,16 +19,21 @@ const { reducer, actions } = createSlice({
     },
 
     goToPrev: (state) => {
+      const trace = Math.max(state.trace - 1, 0);
       return {
         ...state,
-        trace: Math.max(state.trace - 1, 0),
+        trace,
+        currentAttendingQuestion: state.questionQueue[trace],
       };
     },
 
     goToNext: (state) => {
+      const trace = Math.min(state.trace + 1, state.questionQueue.length - 1);
+
       return {
         ...state,
-        trace: Math.min(state.trace + 1, state.questionQueue.length - 1),
+        trace,
+        currentAttendingQuestion: state.questionQueue[trace],
       };
     },
   },
