@@ -3,15 +3,21 @@ import { Quiz, quizLoader } from './pages/Quiz';
 import { Result } from './pages/Result';
 import { Main, startQuizAction } from './pages/Main';
 import './styles/App.css';
+import Layouts from './component/Layout';
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <Main />,
-    action: startQuizAction,
+    element: <Layouts />,
+    children: [
+      {
+        path: '/',
+        element: <Main />,
+        action: startQuizAction,
+      },
+      { path: '/quiz', element: <Quiz />, loader: quizLoader },
+      { path: '/result', element: <Result /> },
+    ],
   },
-  { path: '/quiz', element: <Quiz />, loader: quizLoader },
-  { path: '/result', element: <Result /> },
 ]);
 
 function App() {

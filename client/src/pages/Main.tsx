@@ -8,8 +8,7 @@ const INPUT_FORM_NAME = 'username';
 
 const Main = () => {
   return (
-    <div className="container">
-      <h1 className="title text-light">Quiz Application</h1>
+    <div>
       <ol>
         <li>You will be asked 10 questions one after another</li>
         <li>10 points is awarded for the correct answer</li>
@@ -46,6 +45,7 @@ const startQuizAction: ActionFunction = async ({ request }) => {
     if (store.getState().result.userId !== username) return;
     resolve();
   });
+  debugger;
   store.dispatch(resultActions.setUserId({ userId: username }));
 
   await promise.then(() => unsubscribe());

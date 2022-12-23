@@ -48,23 +48,21 @@ const Questions = ({ questions }: QuestionListProps) => {
   }
 
   return (
-    <div className="container">
+    <div>
       <h1>{question}</h1>
       <ul id={questionId.toString()}>
         {questionOption.map((option, index) => (
-          <li
-            key={option.id}
-            onClick={onSelectOption({
-              questionId: questionId.toString(),
-              answerId: option.id,
-              position: index,
-              value: option.value,
-            })}
-          >
+          <li key={option.id}>
             <input
               type="radio"
               name="options"
               id={`q${index}-option`}
+              onChange={onSelectOption({
+                questionId: questionId.toString(),
+                answerId: option.id,
+                position: index,
+                value: option.value,
+              })}
               checked={questionAnswer?.id === option.id}
             />
             <label className="text-primary" htmlFor={`q${index}-option`}>
