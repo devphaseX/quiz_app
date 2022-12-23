@@ -6,13 +6,9 @@ import {
   makeQuestionUnique,
   optionableQuestion,
 } from '../database/data';
-import { Dispatch, Suspense } from 'react';
+import { Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { questionActions } from '../store/questions';
-
-type PrevActionObject = ReturnType<typeof questionActions.goToPrev>;
-type NextActionObject = ReturnType<typeof questionActions.goToNext>;
-type QuestionActionObject = PrevActionObject | NextActionObject;
 
 const Quiz = () => {
   const deferLoader = useLoaderData() as {
@@ -37,7 +33,7 @@ const Quiz = () => {
 };
 
 const QuestionControl = () => {
-  const dispatch = useDispatch<Dispatch<QuestionActionObject>>();
+  const dispatch = useDispatch();
 
   const { allowNext, allowPrev } = useSelector((state: GlobalStoreState) => ({
     allowPrev: state.questions.trace !== 0,

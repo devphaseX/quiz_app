@@ -1,13 +1,19 @@
 import { Link } from 'react-router-dom';
 import '../styles/Result.css';
+import { ResultTable } from '../component/ResultTable';
+import { useDispatch } from 'react-redux';
+import { resultActions } from '../store/result';
 
 const Result = () => {
-  const onClick = () => {
-    console.log('on restart');
+  const dispatach = useDispatch();
+
+  const restartQuizHandler = () => {
+    dispatach(resultActions.resetResult());
   };
+
   return (
     <div>
-      <div className="result flex-content">
+      <div className="result flex-center">
         <div className="flex">
           <span>Username</span>
           <span className="bold">Daily Tuition</span>
@@ -35,10 +41,12 @@ const Result = () => {
         </div>
       </div>
       <div className="start">
-        <Link className="btn" to="/" onClick={onClick}>
+        <Link className="btn" to="/" onClick={restartQuizHandler}>
           Restart
         </Link>
       </div>
+
+      <ResultTable />
     </div>
   );
 };

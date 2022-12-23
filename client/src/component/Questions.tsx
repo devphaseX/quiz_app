@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { QuestionWithUniqueOption } from '../database/data';
-import { Dispatch, useEffect } from 'react';
+import { useEffect } from 'react';
 import { questionActions } from '../store/questions';
 import { ChoosenAnswerAction, resultActions } from '../store/result';
 
@@ -8,12 +8,8 @@ interface QuestionListProps {
   questions: Array<QuestionWithUniqueOption>;
 }
 
-type StartQuizAction = ReturnType<typeof questionActions.startQuiz>;
-type SetQuestionAnswer = ReturnType<typeof resultActions.setQuestionAnswer>;
-type DispatchActionType = StartQuizAction | SetQuestionAnswer;
-
 const Questions = ({ questions }: QuestionListProps) => {
-  const dispatch = useDispatch<Dispatch<DispatchActionType>>();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(questionActions.startQuiz(questions));
