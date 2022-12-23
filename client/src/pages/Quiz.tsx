@@ -20,19 +20,19 @@ const Quiz = () => {
   };
 
   return (
-    <div>
-      <Suspense fallback={<h3 className="text-light">Loading...</h3>}>
-        <Await
-          resolve={deferLoader.questions}
-          errorElement={<h3>Something went wrong</h3>}
-        >
-          {(questions) => {
-            return <Questions questions={questions} />;
-          }}
-        </Await>
-      </Suspense>
-      <QuestionControl />
-    </div>
+    <Suspense fallback={<h3 className="text-light">Loading...</h3>}>
+      <Await
+        resolve={deferLoader.questions}
+        errorElement={<h3>Something went wrong</h3>}
+      >
+        {(questions) => (
+          <div>
+            <Questions questions={questions} />
+            <QuestionControl />
+          </div>
+        )}
+      </Await>
+    </Suspense>
   );
 };
 
@@ -41,7 +41,7 @@ const QuestionControl = () => {
 
   const { allowNext, allowPrev } = useSelector((state: GlobalStoreState) => ({
     allowPrev: state.questions.trace !== 0,
-    allowNext: state.questions.trace < state.questions.questionQueue.length,
+    allowNext: state.questions.trace + 1 < state.questions.questionQueue.length,
   }));
 
   const onRequestPreviousQuiz = () => {
@@ -53,22 +53,24 @@ const QuestionControl = () => {
 
   return (
     <div className="grid">
-      <button
-        type="button"
-        onClick={onRequestPreviousQuiz}
-        className="btn prev"
-        disabled={allowPrev === false}
-      >
-        Prev
-      </button>
-      <button
-        type="button"
-        onClick={onRequestNextQuiz}
-        className="btn next"
-        disabled={allowNext === false}
-      >
-        Next
-      </button>
+      {allowPrev ? (
+        <button
+          type="button"
+          onClick={onRequestPreviousQuiz}
+          className="btn prev"
+        >
+          Prev
+        </button>
+      ) : (
+        <div></div>
+      )}
+      {allowNext ? (
+        <button type="button" onClick={onRequestNextQuiz} className="btn next">
+          Next
+        </button>
+      ) : (
+        <div></div>
+      )}
     </div>
   );
 };

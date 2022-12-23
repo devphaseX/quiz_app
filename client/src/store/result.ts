@@ -36,6 +36,10 @@ const { actions, reducer } = createSlice({
         ...answerSpecific,
       };
     },
+
+    resetResult() {
+      return { userId: null, result: {} };
+    },
   },
 });
 
