@@ -64,6 +64,7 @@ const insertResults: RequestHandler = async (req, res) => {
   try {
     const { username, result, attempts, point, archieved } = req.body;
 
+    console.log(req.body);
     if (!(username && result)) throw 'missing property {username},{result}';
     await Result.create({
       username,
