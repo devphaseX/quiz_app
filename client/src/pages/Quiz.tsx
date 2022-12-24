@@ -6,27 +6,26 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import { Questions } from '../component/Questions';
-import { getExternalFulfillPromise } from '../util';
-import { QuestionWithUniqueOption, getQuestions } from '../database/data';
+import { QuizData } from '../database/data';
 import { Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { questionActions } from '../store/questions';
 import { resultActions } from '../store/result';
+import { getAvailableQuiz } from '../database';
 
 const Quiz = () => {
   const deferLoader = useLoaderData() as {
-    questions: Promise<Array<QuestionWithUniqueOption>>;
+    questions: Promise<QuizData>;
   };
-
   return (
     <Suspense fallback={<h3 className="text-light">Loading...</h3>}>
       <Await
         resolve={deferLoader.questions}
         errorElement={<h3>Something went wrong</h3>}
       >
-        {(questions) => (
+        {(quiz: QuizData) => (
           <div>
-            <Questions questions={questions} />
+            <Questions quiz={quiz} />
             <QuestionControl />
           </div>
         )}
@@ -76,16 +75,10 @@ const QuestionControl = () => {
   );
 };
 
-function dummyFetch() {
-  const { promise, resolve } =
-    getExternalFulfillPromise<Array<QuestionWithUniqueOption>>();
-  setTimeout(() => {
-    resolve(getQuestions());
-  }, 1000);
-  return promise;
-}
 const quizLoader: LoaderFunction = () => {
-  return defer({ questions: dummyFetch() });
+  return defer({
+    questions: getAvailableQuiz().then((quizList) => quizList[0]),
+  });
 };
 
-export { Quiz, quizLoader };
+export { quizLoader, Quiz };

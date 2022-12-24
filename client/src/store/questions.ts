@@ -1,8 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {
-  QuestionWithChoosenAnswer,
-  QuestionWithUniqueOption,
-} from '../database/data';
+import { QuestionWithChoosenAnswer } from '../database/data';
 
 type AttemptableQuestion = QuestionWithChoosenAnswer & {
   answer?: QuestionWithChoosenAnswer['answer'];
@@ -11,6 +8,7 @@ type AttemptableQuestion = QuestionWithChoosenAnswer & {
 const { reducer, actions } = createSlice({
   name: 'questions',
   initialState: {
+    quizId: null as null | string,
     questionQueue: <Array<AttemptableQuestion>>[],
     trace: 0,
     currentAttendingQuestion: <null | AttemptableQuestion>null,
@@ -19,8 +17,9 @@ const { reducer, actions } = createSlice({
     startQuiz: (state, action) => {
       return {
         ...state,
-        questionQueue: action.payload,
-        currentAttendingQuestion: action.payload[0],
+        quizId: action.payload._id,
+        questionQueue: action.payload.questions,
+        currentAttendingQuestion: action.payload.questions[0],
         trace: 0,
       };
     },

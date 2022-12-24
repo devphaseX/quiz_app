@@ -1,4 +1,4 @@
-import { QuestionWithChoosenAnswer } from '../database/data';
+import { AnsweredQuiz, QuestionWithChoosenAnswer } from '../database/data';
 
 interface ExternalFulfilPromise<R> {
   resolve: (result: R) => void;
@@ -39,25 +39,19 @@ const delayResolve = <T>(
 const nanoid = () => Math.random().toString(32).slice(2);
 
 const calculatePoint = (
-  userProvided: Array<QuestionWithChoosenAnswer>,
-  serverProvided: typeof userProvided,
-  point: number
+  point: number,
+  option: {
+    attemptedQuestion: Array<QuestionWithChoosenAnswer>;
+    quizAnswer: AnsweredQuiz['answers'];
+  }
 ) => {
-  const idMappedQuestion = new Map<string, QuestionWithChoosenAnswer>();
-  userProvided.forEach((question) => {
-    idMappedQuestion.set(question.id.toString(), question);
-  });
+  const { attemptedQuestion, quizAnswer } = option;
 
-  return serverProvided.reduce((score, sQuestion) => {
-    const uQuestion = idMappedQuestion.get(sQuestion.id.toString());
-
-    return uQuestion
-      ? uQuestion.answer.id === sQuestion.answer.id &&
-        uQuestion.answer.value === sQuestion.answer.value
-        ? score + point
-        : score
-      : score;
-  }, 0);
+  return attemptedQuestion.reduce(
+    (score, question) =>
+      quizAnswer[question.id] === question.answer.id ? score + point : score,
+    0
+  );
 };
 
 const getFlagStatus = (earnedPoint: number, totalPoints: number) => {

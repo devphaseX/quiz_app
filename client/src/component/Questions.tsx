@@ -1,24 +1,24 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { QuestionWithUniqueOption } from '../database/data';
+import { QuestionWithUniqueOption, QuizData } from '../database/data';
 import { useEffect } from 'react';
 import { questionActions } from '../store/questions';
 
 interface QuestionListProps {
-  questions: Array<QuestionWithUniqueOption>;
+  quiz: QuizData;
 }
 
-const Questions = ({ questions }: QuestionListProps) => {
+const Questions = ({ quiz }: QuestionListProps) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(questionActions.startQuiz(questions));
+    dispatch(questionActions.startQuiz(quiz));
   }, []);
 
   const { currentAttendingQuestion, trace } = useSelector(
     (state) => (state as GlobalStoreState).questions
   );
 
-  const questionObject = currentAttendingQuestion || questions[trace];
+  const questionObject = currentAttendingQuestion || quiz.questions[trace];
   const { id: questionId, question, options: questionOption } = questionObject;
 
   return (

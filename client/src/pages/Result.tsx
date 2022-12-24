@@ -4,37 +4,27 @@ import { ResultTable } from '../component/ResultTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { resultActions } from '../store/result';
 import { store } from '../store';
-import {
-  Question,
-  QuestionWithChoosenAnswer,
-  getAnswersId,
-  getQuestions,
-} from '../database/data';
+
 import { Suspense } from 'react';
-import { calculatePoint, delayResolve, getFlagStatus } from '../util';
+import { calculatePoint, getFlagStatus } from '../util';
 import { useQuestionResult } from '../hooks/useQuestionResult';
+import { getQuizAnswer } from '../database';
+import { AnsweredQuiz } from '../database/data';
 
 const Result = () => {
-  const serverResult = useLoaderData() as AnswerDeferredObject;
+  const deferData = useLoaderData() as AnswerDeferredObject;
   return (
     <div>
       <Suspense fallback={<h3 className="text-light">Processing result...</h3>}>
-        <Await resolve={serverResult.answeredQuestion}>
-          {(result) => <DisplayResult sortQuestionObject={result} />}
+        <Await resolve={deferData.answeredQuiz}>
+          {(result: AnsweredQuiz) => <DisplayResult quiz={result} />}
         </Await>
       </Suspense>
     </div>
   );
 };
 
-const DisplayResult = ({
-  sortQuestionObject: serverProvidedQuestionsWithAnswer,
-}: {
-  sortQuestionObject: QuestionWithAnswerSort;
-}) => {
-  if (serverProvidedQuestionsWithAnswer.invalid.length !== 0) {
-    throw serverProvidedQuestionsWithAnswer.invalid;
-  }
+const DisplayResult = ({ quiz: answeredQuiz }: { quiz: AnsweredQuiz }) => {
   const dispatch = useDispatch();
   const {
     intrepreted,
@@ -46,11 +36,12 @@ const DisplayResult = ({
   const totalQuestionNo = __raw.questions.length;
   const totalPoint = totalQuestionNo * point;
   const attemptedFrequency = intrepreted.attempted;
-  const earnedPoint = calculatePoint(
-    intrepreted.anweredQuestions,
-    serverProvidedQuestionsWithAnswer.valid,
-    point
-  );
+
+  const earnedPoint = calculatePoint(point, {
+    attemptedQuestion: intrepreted.anweredQuestions,
+    quizAnswer: answeredQuiz.answers,
+  });
+
   const status = getFlagStatus(earnedPoint, totalPoint);
 
   const restartQuizHandler = () => {
@@ -109,9 +100,7 @@ const DisplayResult = ({
 };
 
 type AnswerDeferredObject = {
-  answeredQuestion:
-    | Promise<QuestionWithAnswerSort>
-    | Array<QuestionWithAnswerSort>;
+  answeredQuiz: Promise<AnsweredQuiz | null> | AnsweredQuiz | null;
 };
 
 function answersLoader() {
@@ -119,40 +108,13 @@ function answersLoader() {
     questions,
     result: { submitted },
   } = store.getState();
-  if (!submitted) {
-    return redirect('/');
-  }
 
-  const _b: AnswerDeferredObject = {
-    answeredQuestion: getAnswersToQuestion(questions.questionQueue),
+  if (!submitted) return redirect('/');
+
+  const deferedData: AnswerDeferredObject = {
+    answeredQuiz: getQuizAnswer(questions.quizId!),
   };
-  return defer(_b);
-}
-
-export interface QuestionWithAnswerSort {
-  valid: Array<QuestionWithChoosenAnswer>;
-  invalid: Array<Question>;
-}
-
-function getAnswersToQuestion(questions: Array<Question>) {
-  const questionsId = new Set<string>();
-  questions.forEach(({ id }) => questionsId.add(id.toString()));
-
-  return delayResolve(2000, () => {
-    const answeredId = getAnswersId();
-    const sort: QuestionWithAnswerSort = { valid: [], invalid: [] };
-
-    getQuestions().forEach((question) => {
-      let answer = question.options.find(({ id }) => answeredId.includes(id));
-      if (questionsId.has(question.id.toString())) {
-        return sort.valid.push({ ...question, answer: answer! });
-      }
-
-      sort.invalid.push(question);
-    });
-
-    return sort;
-  });
+  return defer(deferedData);
 }
 
 export { Result, answersLoader };
