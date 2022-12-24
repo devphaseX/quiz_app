@@ -36,7 +36,6 @@ const { actions, reducer } = createSlice({
     setUserId: (state, action: UserIdAction) => {
       state.userId = action.payload.userId;
     },
-
     resetResult: getDefaultResultState,
     placeQuestionForSubmission: (state) => {
       return { ...state, submitted: true };

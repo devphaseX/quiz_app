@@ -87,7 +87,12 @@ const DisplayResult = ({
 
         <div className="flex">
           <span>Quiz Result</span>
-          <span className="bold">{status}</span>
+          <span
+            style={{ color: status === 'passed' ? 'green' : 'red' }}
+            className="bold"
+          >
+            {status}
+          </span>
         </div>
       </div>
       <div className="start">
