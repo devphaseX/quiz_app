@@ -1,4 +1,15 @@
-const ResultTable = () => (
+type ResultRow = [
+  username: string,
+  attemptedNo: number,
+  earnedPoint: number,
+  status: 'passed' | 'failed'
+];
+
+const ResultTable = ({
+  result: [username, attemptedNo, earnedPoint, status],
+}: {
+  result: ResultRow;
+}) => (
   <div className="container">
     <table>
       <thead className="table-header">
@@ -11,14 +22,16 @@ const ResultTable = () => (
       </thead>
       <tbody>
         <tr className="table-body">
-          <td>Daily tuition</td>
-          <td>03</td>
-          <td>20</td>
-          <td>Passed</td>
+          <td>{username}</td>
+          <td>{attemptedNo}</td>
+          <td>{earnedPoint}</td>
+          <td>{status}</td>
         </tr>
       </tbody>
     </table>
   </div>
 );
+
+export type { ResultRow };
 
 export { ResultTable };

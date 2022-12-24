@@ -1,3 +1,5 @@
+import { QuestionWithChoosenAnswer } from '../database/data';
+
 interface ExternalFulfilPromise<R> {
   resolve: (result: R) => void;
   reject: (reason: unknown) => void;
@@ -35,5 +37,38 @@ const delayResolve = <T>(
 };
 
 const nanoid = () => Math.random().toString(32).slice(2);
+
+const calculatePoint = (
+  userProvided: Array<QuestionWithChoosenAnswer>,
+  serverProvided: typeof userProvided,
+  point: number
+) => {
+  const idMappedQuestion = new Map<string, QuestionWithChoosenAnswer>();
+  userProvided.forEach((question) => {
+    idMappedQuestion.set(question.id.toString(), question);
+  });
+
+  return serverProvided.reduce((score, sQuestion) => {
+    const uQuestion = idMappedQuestion.get(sQuestion.id.toString());
+
+    return uQuestion
+      ? uQuestion.answer.id === sQuestion.answer.id &&
+        uQuestion.answer.value === sQuestion.answer.value
+        ? score + point
+        : score
+      : score;
+  }, 0);
+};
+
+const getFlagStatus = (earnedPoint: number, totalPoints: number) => {
+  return earnedPoint < (totalPoints * 50) / 100 ? 'failed' : 'passed';
+};
+
 export type { ExternalFulfilPromise };
-export { getExternalFulfillPromise, delayResolve, nanoid };
+export {
+  getExternalFulfillPromise,
+  delayResolve,
+  nanoid,
+  calculatePoint,
+  getFlagStatus,
+};

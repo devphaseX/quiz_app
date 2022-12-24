@@ -9,6 +9,7 @@ interface QuestionWithChoosenAnswer extends QuestionWithUniqueOption {
   answer: UniqueAnswer;
 }
 
+type QuestionWithoutChoosenAnswer = QuestionWithUniqueOption;
 interface UniqueAnswer {
   id: string;
   value: string;
@@ -116,4 +117,5 @@ export type {
   QuestionWithUniqueOption,
   UniqueAnswer,
   QuestionWithChoosenAnswer,
+  QuestionWithoutChoosenAnswer,
 };

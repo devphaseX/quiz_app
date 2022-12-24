@@ -17,17 +17,15 @@ interface ChoosenAnswerAction extends Action {
 type QuestionID = string;
 type AnswerObject = UniqueAnswer & { position: number };
 
-type QuizAnswers = { [id in QuestionID]?: AnswerObject };
-
 interface QuestionResult {
   userId: null | string;
-  result: QuizAnswers;
+  readonly point: number;
   submitted: boolean;
 }
 
 const getDefaultResultState = (): QuestionResult => ({
   userId: null,
-  result: {},
+  point: 10,
   submitted: false,
 });
 
@@ -39,14 +37,6 @@ const { actions, reducer } = createSlice({
       state.userId = action.payload.userId;
     },
 
-    setQuestionAnswer: (state, action: ChoosenAnswerAction) => {
-      const { questionId: _, answerId: id, ...answerSpecific } = action.payload;
-      state.result[action.payload.questionId] = {
-        id: id.toString(),
-        ...answerSpecific,
-      };
-    },
-
     resetResult: getDefaultResultState,
     placeQuestionForSubmission: (state) => {
       return { ...state, submitted: true };
@@ -54,5 +44,5 @@ const { actions, reducer } = createSlice({
   },
 });
 
-export type { AnswerObject, ChoosenAnswerAction, QuizAnswers, QuestionResult };
+export type { AnswerObject, ChoosenAnswerAction, QuestionResult };
 export { actions as resultActions, reducer as resultReducer };

@@ -1,20 +1,21 @@
-import { QuestionWithAnswerSort } from './../pages/Result';
 import { useSelector } from 'react-redux';
-import { type QuestionWithChoosenAnswer } from '../database/data';
+import {
+  QuestionWithoutChoosenAnswer,
+  type QuestionWithChoosenAnswer,
+} from '../database/data';
 
 const useQuestionResult = () => {
   return useSelector(
     ({
       questions: { questionQueue },
-      result: { result, userId },
+      result: { userId },
     }: GlobalStoreState) => {
       const anweredQuestions: Array<QuestionWithChoosenAnswer> = [];
-      const leftoutQuestions: typeof questionQueue = [];
+      const leftoutQuestions: Array<QuestionWithoutChoosenAnswer> = [];
 
       questionQueue.forEach((question) => {
-        const answer = result[question.id];
-        if (answer) {
-          anweredQuestions.push({ ...question, answer });
+        if (question.answer) {
+          anweredQuestions.push({ ...question });
         } else {
           leftoutQuestions.push(question);
         }
@@ -26,7 +27,6 @@ const useQuestionResult = () => {
         userInfo: { id: userId, username: userId },
         __raw: {
           questions: questionQueue,
-          result,
         },
         intrepreted: {
           anweredQuestions,

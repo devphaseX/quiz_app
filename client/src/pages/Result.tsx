@@ -1,7 +1,7 @@
 import { Await, Link, defer, redirect, useLoaderData } from 'react-router-dom';
 import '../styles/Result.css';
 import { ResultTable } from '../component/ResultTable';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { resultActions } from '../store/result';
 import { store } from '../store';
 import {
@@ -11,7 +11,7 @@ import {
   getQuestions,
 } from '../database/data';
 import { Suspense } from 'react';
-import { delayResolve } from '../util';
+import { calculatePoint, delayResolve, getFlagStatus } from '../util';
 import { useQuestionResult } from '../hooks/useQuestionResult';
 
 const Result = () => {
@@ -28,21 +28,30 @@ const Result = () => {
 };
 
 const DisplayResult = ({
-  sortQuestionObject,
+  sortQuestionObject: serverProvidedQuestionsWithAnswer,
 }: {
   sortQuestionObject: QuestionWithAnswerSort;
 }) => {
-  if (sortQuestionObject.invalid.length !== 0) {
-    throw sortQuestionObject.invalid;
+  if (serverProvidedQuestionsWithAnswer.invalid.length !== 0) {
+    throw serverProvidedQuestionsWithAnswer.invalid;
   }
   const dispatch = useDispatch();
-  const { intrepreted, __raw } = useQuestionResult();
-  const { valid: validQuestions } = sortQuestionObject;
-  // const totalPoint = validQuestions.reduce((score, question) => {
-  //   if(intrepreted.anweredQuestions.find((id) => {
+  const {
+    intrepreted,
+    __raw,
+    userInfo: { username },
+  } = useQuestionResult();
+  const point = useSelector((state: GlobalStoreState) => state.result.point);
 
-  //   }) )
-  // },0)
+  const totalQuestionNo = __raw.questions.length;
+  const totalPoint = totalQuestionNo * point;
+  const attemptedFrequency = intrepreted.attempted;
+  const earnedPoint = calculatePoint(
+    intrepreted.anweredQuestions,
+    serverProvidedQuestionsWithAnswer.valid,
+    point
+  );
+  const status = getFlagStatus(earnedPoint, totalPoint);
 
   const restartQuizHandler = () => {
     dispatch(resultActions.resetResult());
@@ -53,28 +62,32 @@ const DisplayResult = ({
       <div className="result flex-center">
         <div className="flex">
           <span>Username</span>
-          <span className="bold">Daily Tuition</span>
+          <span className="bold">{username}</span>
         </div>
         <div className="flex">
           <span>Total Quiz Points : </span>
-          <span className="bold">50</span>
+          <span className="bold">{totalPoint}</span>
         </div>
         <div className="flex">
           <span>Total Question : </span>
-          <span className="bold">05</span>
+          <span className="bold">
+            {totalQuestionNo.toString().padStart(2, '0')}
+          </span>
         </div>
         <div className="flex">
           <span>Total Attempt : </span>
-          <span className="bold">03</span>
+          <span className="bold">
+            {attemptedFrequency.toString().padStart(2, '0')}
+          </span>
         </div>
         <div className="flex">
           <span>Total Earn Point : </span>
-          <span className="bold">30</span>
+          <span className="bold">{earnedPoint}</span>
         </div>
 
         <div className="flex">
           <span>Quiz Result</span>
-          <span className="bold">Passed</span>
+          <span className="bold">{status}</span>
         </div>
       </div>
       <div className="start">
@@ -83,7 +96,9 @@ const DisplayResult = ({
         </Link>
       </div>
 
-      <ResultTable />
+      <ResultTable
+        result={[username!, attemptedFrequency, earnedPoint, status]}
+      />
     </>
   );
 };
@@ -124,9 +139,9 @@ function getAnswersToQuestion(questions: Array<Question>) {
 
     getQuestions().forEach((question) => {
       let answer = question.options.find(({ id }) => answeredId.includes(id));
-      // if (questionsId.has(question.id.toString())) {
-      //   return sort.valid.push({ ...question, answer: answer! });
-      // }
+      if (questionsId.has(question.id.toString())) {
+        return sort.valid.push({ ...question, answer: answer! });
+      }
 
       sort.invalid.push(question);
     });
