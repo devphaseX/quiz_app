@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only ./src/server/index.ts",
+    "dev": "NODE_ENV=development ts-node-dev --respawn --transpile-only ./src/index.ts",
+    "db_initial": "NODE_ENV=development ts-node-dev --respawn --transpile-only ./src/config/db/initial.ts",
     "prod": "NODE_ENV=production ts-node ./src/server/index.ts",
     "dev:bun": "bun run dev"
   },
