@@ -75,7 +75,7 @@ const QuestionControl = () => {
 
 const quizLoader: LoaderFunction = () => {
   return defer({
-    questions: delayResolve(2000, () =>
+    questions: delayResolve(1500, () =>
       getAvailableQuiz().then((quizList) => quizList[0])
     ),
   });

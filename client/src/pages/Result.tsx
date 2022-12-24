@@ -12,7 +12,7 @@ import {
   getFlagStatus,
   sortQuestion,
 } from '../util';
-import { getQuizAnswer, storeUserResult } from '../data';
+import { getQuizAnswer, syncUserResultWithServer } from '../data';
 
 const Result = () => {
   const deferData = useLoaderData() as AnswerDeferredObject;
@@ -90,17 +90,25 @@ type AnswerDeferredObject = {
 };
 
 function answersLoader() {
-  const {
-    questions: { quizId, questionQueue },
-    result: { submitted, point, userId },
-  } = store.getState();
+  const { quizId, submitted } = (() => {
+    const state = store.getState();
+    return {
+      submitted: state.result.submitted,
+      quizId: state.questions.quizId,
+    };
+  })();
 
   if (!submitted) return redirect('/');
 
   const deferedData: AnswerDeferredObject = {
-    answeredQuiz: delayResolve(1500, () => getQuizAnswer(quizId!)).then(
+    answeredQuiz: delayResolve(1000, getQuizAnswer.bind(null, quizId!)).then(
       (result) => {
         if (!result) return result;
+
+        const { questions, result: clientQuizResult } = store.getState();
+        const { questionQueue, quizId } = questions;
+        const { point, userId } = clientQuizResult;
+
         const { intrepreted, __raw } = sortQuestion(questionQueue, {
           userId: userId!,
         });
@@ -123,7 +131,7 @@ function answersLoader() {
           result: { quizId, answerIds: result.answers },
         };
 
-        return storeUserResult(results).then<QuizResultDisplay>(() => {
+        return syncUserResultWithServer(results).then<QuizResultDisplay>(() => {
           return {
             username: userId!,
             attempts: attemptedFrequency,

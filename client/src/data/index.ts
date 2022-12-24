@@ -23,7 +23,7 @@ function getQuizAnswer(quizId: string) {
     });
 }
 
-function storeUserResult(quizResult: any) {
+function syncUserResultWithServer(quizResult: any) {
   return fetch(`http://localhost:5050/api/results`, {
     method: 'POST',
     body: JSON.stringify(quizResult),
@@ -33,4 +33,4 @@ function storeUserResult(quizResult: any) {
   });
 }
 
-export { getAvailableQuiz, getQuizAnswer, storeUserResult };
+export { getAvailableQuiz, getQuizAnswer, syncUserResultWithServer };
