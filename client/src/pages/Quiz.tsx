@@ -44,13 +44,10 @@ const QuestionControl = () => {
     allowNext: state.questions.trace + 1 < state.questions.questionQueue.length,
   }));
 
-  const onRequestPreviousQuiz = () => {
-    dispatch(questionActions.goToPrev());
-  };
+  const onRequestPreviousQuiz = () => dispatch(questionActions.goToPrev());
   const onRequestNextQuiz = () => {
-    if (allowNext) {
-      dispatch(questionActions.goToNext());
-    } else {
+    if (allowNext) dispatch(questionActions.goToNext());
+    else {
       dispatch(resultActions.placeQuestionForSubmission());
       navigate('/result');
     }
