@@ -1,5 +1,9 @@
 import { AnsweredQuiz, QuizData } from './type';
 
+function cleanPath(path: string) {
+  return path.replace(/(?<!http[s]?:)\B[/]{2,}/, '/');
+}
+
 function getAvailableQuiz() {
   return fetch('http://localhost:5050/api/questions')
     .then((res) => res.json())
@@ -19,4 +23,14 @@ function getQuizAnswer(quizId: string) {
     });
 }
 
-export { getAvailableQuiz, getQuizAnswer };
+function storeUserResult(quizResult: any) {
+  return fetch(`http://localhost:5050/api/results`, {
+    method: 'POST',
+    body: JSON.stringify(quizResult),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
+export { getAvailableQuiz, getQuizAnswer, storeUserResult };

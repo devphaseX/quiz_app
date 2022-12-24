@@ -5,12 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { resultActions } from '../store/result';
 import { store } from '../store';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { calculatePoint, delayResolve, getFlagStatus } from '../util';
 import { useQuestionResult } from '../hooks/useQuestionResult';
-import { getQuizAnswer } from '../data';
+import { getQuizAnswer, storeUserResult } from '../data';
 import { AnsweredQuiz } from '../data/type';
-import { delay } from '@reduxjs/toolkit/dist/utils';
 
 const Result = () => {
   const deferData = useLoaderData() as AnswerDeferredObject;
@@ -32,7 +31,10 @@ const DisplayResult = ({ quiz: answeredQuiz }: { quiz: AnsweredQuiz }) => {
     __raw,
     userInfo: { username },
   } = useQuestionResult();
-  const point = useSelector((state: GlobalStoreState) => state.result.point);
+  const { point, quizId } = useSelector((state: GlobalStoreState) => ({
+    point: state.result.point,
+    quizId: state.questions.quizId,
+  }));
 
   const totalQuestionNo = __raw.questions.length;
   const totalPoint = totalQuestionNo * point;
@@ -48,6 +50,20 @@ const DisplayResult = ({ quiz: answeredQuiz }: { quiz: AnsweredQuiz }) => {
   const restartQuizHandler = () => {
     dispatch(resultActions.resetResult());
   };
+
+  useEffect(() => {
+    const results = {
+      username,
+      attempts: attemptedFrequency,
+      point: earnedPoint,
+      archieved: status,
+      result: { quizId, answerIds: answeredQuiz.answers },
+    };
+    (async () => {
+      await storeUserResult(results);
+      console.log('result sync with server');
+    })();
+  }, []);
 
   return (
     <>
