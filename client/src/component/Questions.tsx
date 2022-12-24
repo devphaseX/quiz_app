@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { QuestionWithUniqueOption, QuizData } from '../database/data';
+import { QuestionWithUniqueOption, QuizData } from '../data/type';
 import { useEffect } from 'react';
 import { questionActions } from '../store/questions';
 

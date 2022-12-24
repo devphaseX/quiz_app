@@ -6,12 +6,13 @@ import {
   useNavigate,
 } from 'react-router-dom';
 import { Questions } from '../component/Questions';
-import { QuizData } from '../database/data';
+import { QuizData } from '../data/type';
 import { Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { questionActions } from '../store/questions';
 import { resultActions } from '../store/result';
-import { getAvailableQuiz } from '../database';
+import { getAvailableQuiz } from '../data';
+import { delayResolve } from '../util';
 
 const Quiz = () => {
   const deferLoader = useLoaderData() as {
@@ -77,7 +78,9 @@ const QuestionControl = () => {
 
 const quizLoader: LoaderFunction = () => {
   return defer({
-    questions: getAvailableQuiz().then((quizList) => quizList[0]),
+    questions: delayResolve(2000, () =>
+      getAvailableQuiz().then((quizList) => quizList[0])
+    ),
   });
 };
 

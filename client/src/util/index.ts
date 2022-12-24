@@ -1,4 +1,4 @@
-import { AnsweredQuiz, QuestionWithChoosenAnswer } from '../database/data';
+import { AnsweredQuiz, QuestionWithChoosenAnswer } from '../data/type';
 
 interface ExternalFulfilPromise<R> {
   resolve: (result: R) => void;
@@ -17,15 +17,9 @@ function getExternalFulfillPromise<R = unknown>(): ExternalFulfilPromise<R> {
   return { resolve: res, reject: rej, promise };
 }
 
-const defaultFallback = Symbol();
-
-const delayResolve = <T>(
-  ms: number,
-  value: T | typeof defaultFallback | (() => T) = defaultFallback
-) => {
+const delayResolve = <T>(ms: number, value: T | (() => Promise<T>)) => {
   const { promise, resolve, reject } = getExternalFulfillPromise<T>();
   setTimeout(() => {
-    if (value === defaultFallback) return;
     try {
       let result = typeof value === 'function' ? (value as Function)() : value;
       resolve(result);

@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import {
   QuestionWithoutChoosenAnswer,
   type QuestionWithChoosenAnswer,
-} from '../database/data';
+} from '../data/type';
 
 const useQuestionResult = () => {
   return useSelector(

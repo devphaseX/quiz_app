@@ -1,4 +1,4 @@
-import { AnsweredQuiz, QuizData } from './data';
+import { AnsweredQuiz, QuizData } from './type';
 
 function getAvailableQuiz() {
   return fetch('http://localhost:5050/api/questions')

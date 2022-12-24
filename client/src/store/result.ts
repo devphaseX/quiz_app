@@ -1,5 +1,5 @@
 import { Action, createSlice } from '@reduxjs/toolkit';
-import { UniqueAnswer } from '../database/data';
+import { UniqueAnswer } from '../data/type';
 
 interface UserIdAction extends Action {
   payload: { userId: string };

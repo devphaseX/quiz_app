@@ -6,10 +6,11 @@ import { resultActions } from '../store/result';
 import { store } from '../store';
 
 import { Suspense } from 'react';
-import { calculatePoint, getFlagStatus } from '../util';
+import { calculatePoint, delayResolve, getFlagStatus } from '../util';
 import { useQuestionResult } from '../hooks/useQuestionResult';
-import { getQuizAnswer } from '../database';
-import { AnsweredQuiz } from '../database/data';
+import { getQuizAnswer } from '../data';
+import { AnsweredQuiz } from '../data/type';
+import { delay } from '@reduxjs/toolkit/dist/utils';
 
 const Result = () => {
   const deferData = useLoaderData() as AnswerDeferredObject;
@@ -112,7 +113,7 @@ function answersLoader() {
   if (!submitted) return redirect('/');
 
   const deferedData: AnswerDeferredObject = {
-    answeredQuiz: getQuizAnswer(questions.quizId!),
+    answeredQuiz: delayResolve(1500, () => getQuizAnswer(questions.quizId!)),
   };
   return defer(deferedData);
 }

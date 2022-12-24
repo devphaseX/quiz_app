@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { QuestionWithChoosenAnswer } from '../database/data';
+import { QuestionWithChoosenAnswer } from '../data/type';
 
 type AttemptableQuestion = QuestionWithChoosenAnswer & {
   answer?: QuestionWithChoosenAnswer['answer'];
