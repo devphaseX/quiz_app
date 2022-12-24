@@ -1,14 +1,17 @@
-import { Await, LoaderFunction, defer, useLoaderData } from 'react-router-dom';
+import {
+  Await,
+  LoaderFunction,
+  defer,
+  useLoaderData,
+  useNavigate,
+} from 'react-router-dom';
 import { Questions } from '../component/Questions';
 import { getExternalFulfillPromise } from '../util';
-import {
-  QuestionWithUniqueOption,
-  makeQuestionUnique,
-  optionableQuestion,
-} from '../database/data';
+import { QuestionWithUniqueOption, getQuestions } from '../database/data';
 import { Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { questionActions } from '../store/questions';
+import { resultActions } from '../store/result';
 
 const Quiz = () => {
   const deferLoader = useLoaderData() as {
@@ -34,6 +37,7 @@ const Quiz = () => {
 
 const QuestionControl = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { allowNext, allowPrev } = useSelector((state: GlobalStoreState) => ({
     allowPrev: state.questions.trace !== 0,
@@ -44,7 +48,12 @@ const QuestionControl = () => {
     dispatch(questionActions.goToPrev());
   };
   const onRequestNextQuiz = () => {
-    dispatch(questionActions.goToNext());
+    if (allowNext) {
+      dispatch(questionActions.goToNext());
+    } else {
+      dispatch(resultActions.placeQuestionForSubmission());
+      navigate('/result');
+    }
   };
 
   return (
@@ -60,13 +69,9 @@ const QuestionControl = () => {
       ) : (
         <div></div>
       )}
-      {allowNext ? (
-        <button type="button" onClick={onRequestNextQuiz} className="btn next">
-          Next
-        </button>
-      ) : (
-        <div></div>
-      )}
+      <button type="button" onClick={onRequestNextQuiz} className="btn next">
+        {!allowNext ? 'Submit' : 'Next'}
+      </button>
     </div>
   );
 };
@@ -75,7 +80,7 @@ function dummyFetch() {
   const { promise, resolve } =
     getExternalFulfillPromise<Array<QuestionWithUniqueOption>>();
   setTimeout(() => {
-    resolve(makeQuestionUnique(optionableQuestion));
+    resolve(getQuestions());
   }, 1000);
   return promise;
 }

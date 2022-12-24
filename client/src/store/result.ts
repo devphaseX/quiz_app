@@ -1,4 +1,5 @@
 import { Action, createSlice } from '@reduxjs/toolkit';
+import { UniqueAnswer } from '../database/data';
 
 interface UserIdAction extends Action {
   payload: { userId: string };
@@ -14,16 +15,25 @@ interface ChoosenAnswerAction extends Action {
 }
 
 type QuestionID = string;
-type AnswerObject = { id: string; value: string; position: number };
+type AnswerObject = UniqueAnswer & { position: number };
 
 type QuizAnswers = { [id in QuestionID]?: AnswerObject };
 
+interface QuestionResult {
+  userId: null | string;
+  result: QuizAnswers;
+  submitted: boolean;
+}
+
+const getDefaultResultState = (): QuestionResult => ({
+  userId: null,
+  result: {},
+  submitted: false,
+});
+
 const { actions, reducer } = createSlice({
   name: 'result',
-  initialState: {
-    userId: null as null | string,
-    result: {} as QuizAnswers,
-  },
+  initialState: getDefaultResultState(),
   reducers: {
     setUserId: (state, action: UserIdAction) => {
       state.userId = action.payload.userId;
@@ -37,11 +47,12 @@ const { actions, reducer } = createSlice({
       };
     },
 
-    resetResult() {
-      return { userId: null, result: {} };
+    resetResult: getDefaultResultState,
+    placeQuestionForSubmission: (state) => {
+      return { ...state, submitted: true };
     },
   },
 });
 
-export type { AnswerObject, ChoosenAnswerAction };
+export type { AnswerObject, ChoosenAnswerAction, QuizAnswers, QuestionResult };
 export { actions as resultActions, reducer as resultReducer };

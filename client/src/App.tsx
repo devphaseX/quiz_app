@@ -1,6 +1,6 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { Quiz, quizLoader } from './pages/Quiz';
-import { Result } from './pages/Result';
+import { Result, answersLoader } from './pages/Result';
 import { Main, startQuizAction } from './pages/Main';
 import './styles/App.css';
 import Layouts from './component/Layout';
@@ -15,7 +15,7 @@ const router = createBrowserRouter([
         action: startQuizAction,
       },
       { path: '/quiz', element: <Quiz />, loader: quizLoader },
-      { path: '/result', element: <Result /> },
+      { path: '/result', element: <Result />, loader: answersLoader },
     ],
   },
 ]);

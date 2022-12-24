@@ -1,12 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { QuestionWithUniqueOption } from '../database/data';
+import {
+  QuestionWithChoosenAnswer,
+  QuestionWithUniqueOption,
+} from '../database/data';
+
+type AttemptableQuestion = QuestionWithChoosenAnswer & {
+  answer?: QuestionWithChoosenAnswer['answer'];
+};
 
 const { reducer, actions } = createSlice({
   name: 'questions',
   initialState: {
-    questionQueue: <Array<QuestionWithUniqueOption>>[],
+    questionQueue: <Array<AttemptableQuestion>>[],
     trace: 0,
-    currentAttendingQuestion: <null | QuestionWithUniqueOption>null,
+    currentAttendingQuestion: <null | AttemptableQuestion>null,
   },
   reducers: {
     startQuiz: (state, action) => {
@@ -35,6 +42,33 @@ const { reducer, actions } = createSlice({
         trace,
         currentAttendingQuestion: state.questionQueue[trace],
       };
+    },
+
+    setAnswer(state, action) {
+      if (!state.currentAttendingQuestion) {
+        throw '';
+      }
+
+      const userAnswer = state.currentAttendingQuestion.options.find(
+        ({ id }) => id === action.payload
+      );
+
+      if (!userAnswer) {
+        throw new TypeError();
+      }
+
+      const updateCurrentQuestion = {
+        ...state.currentAttendingQuestion,
+        answer: { ...userAnswer },
+      };
+
+      state.questionQueue = state.questionQueue.map((question) =>
+        question.id === updateCurrentQuestion.id
+          ? updateCurrentQuestion
+          : question
+      );
+
+      state.currentAttendingQuestion = updateCurrentQuestion;
     },
   },
 });

@@ -25,6 +25,7 @@ const Questions = ({ questions }: QuestionListProps) => {
   const questionAnswer = useSelector(
     (state: GlobalStoreState) => state.result.result[questionId]
   );
+
   function onSelectOption({
     questionId,
     answerId,

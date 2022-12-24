@@ -1,12 +1,12 @@
-import { read } from 'fs';
+import { nanoid } from '@reduxjs/toolkit';
 
 interface Question {
   id: string | number;
   question: string;
 }
 
-interface QuestionWithOption extends Question {
-  options: Array<string>;
+interface QuestionWithChoosenAnswer extends QuestionWithUniqueOption {
+  answer: UniqueAnswer;
 }
 
 interface UniqueAnswer {
@@ -16,71 +16,104 @@ interface UniqueAnswer {
 
 interface QuestionWithUniqueOption extends Question {
   options: Array<UniqueAnswer>;
-  readonly _unique: true;
 }
 
-function makeQuestionUnique(
-  questions: Array<QuestionWithOption>
-): Array<QuestionWithUniqueOption> {
-  function createUnqiqueQuestion(
-    question: QuestionWithOption
-  ): QuestionWithUniqueOption {
-    const uniqueOption = new Set(
-      question.options.map((op) => op.toLowerCase())
-    );
+const answerIdCache = new Map<string, string>();
 
-    return {
-      ...question,
-      options: [...uniqueOption].map((option) => ({
-        id: Math.random().toString(32).slice(2),
-        value: option,
-      })),
-      _unique: true,
-    };
+function getQuestionCacheOptions(
+  question: Question,
+  options: QuestionWithUniqueOption['options']
+) {
+  const _cacheOptionsString = answerIdCache.get(question.id.toString());
+  const _options = _cacheOptionsString
+    ? (JSON.parse(_cacheOptionsString) as typeof options)
+    : options;
+
+  if (!_cacheOptionsString) {
+    answerIdCache.set(question.id.toString(), JSON.stringify(_options));
   }
 
-  return questions.map((question) =>
-    (question as any).__unique === true
-      ? (question as unknown as QuestionWithUniqueOption)
-      : createUnqiqueQuestion(question)
-  );
+  return { ...question, options: _options };
 }
 
-const optionableQuestion: Array<QuestionWithOption> = [
-  {
-    id: 1,
-    question: 'Javascript is an _______ language',
-    options: ['Object-Oriented', 'Object-Based', 'Procedural'],
-  },
-  {
-    id: 2,
-    question:
-      'Following methods can be used to display data in some form using Javascript',
-    options: ['document.write()', 'console.log()', 'window.alert()'],
-  },
-  {
-    id: 3,
-    question:
-      'When an operator value is NULL, the typeof returned by the unary operator is:',
-    options: ['Boolean', 'Undefined', 'Object'],
-  },
-  {
-    id: 4,
-    question: 'What does the toString() method return?',
-    options: ['Return Object', 'Return String', 'Return Integer'],
-  },
-  {
-    id: 5,
-    question:
-      'Which function is used to serialize an object into a JSON string?',
-    options: ['stringify()', 'parse()', 'convert()'],
-  },
+const getQuestions = (): Array<QuestionWithUniqueOption> => [
+  getQuestionCacheOptions(
+    {
+      id: 1,
+      question: 'Javascript is an _______ language',
+    },
+    [
+      { id: nanoid(), value: 'Object-Oriented' },
+      { id: nanoid(), value: 'Object-Based' },
+      { id: nanoid(), value: 'Procedural' },
+    ]
+  ),
+  getQuestionCacheOptions(
+    {
+      id: 2,
+      question:
+        'Following methods can be used to display data in some form using Javascript',
+    },
+    [
+      { id: nanoid(), value: 'document.write()' },
+      { id: nanoid(), value: 'console.log()' },
+      { id: nanoid(), value: 'window.alert()' },
+    ]
+  ),
+  getQuestionCacheOptions(
+    {
+      id: 3,
+      question:
+        'When an operator value is NULL, the typeof returned by the unary operator is:',
+    },
+    [
+      { id: nanoid(), value: 'Boolean' },
+      { id: nanoid(), value: 'Undefined' },
+      { id: nanoid(), value: 'Object' },
+    ]
+  ),
+  getQuestionCacheOptions(
+    {
+      id: 4,
+      question: 'What does the toString() method return?',
+    },
+    [
+      { id: nanoid(), value: 'Return Object' },
+      { id: nanoid(), value: 'Return String' },
+      { id: nanoid(), value: 'Return Integer' },
+    ]
+  ),
+  getQuestionCacheOptions(
+    {
+      id: 5,
+      question:
+        'Which function is used to serialize an object into a JSON string?',
+    },
+    [
+      { id: nanoid(), value: 'stringify()' },
+      { id: nanoid(), value: 'parse()' },
+      { id: nanoid(), value: 'convert()' },
+    ]
+  ),
 ];
 
-export { optionableQuestion, makeQuestionUnique };
+const getAnswersId = () => {
+  const answerQuestionsToAnswerId = { '1': 1, '2': 2, '3': 3, '4': 2, '5': 1 };
+  return getQuestions().map((question) => {
+    const answerPosition = answerQuestionsToAnswerId[
+      question.id as keyof typeof answerQuestionsToAnswerId
+    ] as number | undefined;
+
+    if (!answerPosition) return '[%empty%]';
+
+    return question.options[answerPosition - 1]!.id;
+  });
+};
+
+export { getQuestions, getAnswersId };
 export type {
   Question,
-  QuestionWithOption,
   QuestionWithUniqueOption,
   UniqueAnswer,
+  QuestionWithChoosenAnswer,
 };

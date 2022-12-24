@@ -45,7 +45,6 @@ const startQuizAction: ActionFunction = async ({ request }) => {
     if (store.getState().result.userId !== username) return;
     resolve();
   });
-  debugger;
   store.dispatch(resultActions.setUserId({ userId: username }));
 
   await promise.then(() => unsubscribe());
