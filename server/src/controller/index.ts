@@ -62,9 +62,15 @@ const getResults: RequestHandler = async (_, res) => {
 };
 const insertResults: RequestHandler = async (req, res) => {
   try {
+    const { username, result, attempts, point, archieved } = req.body;
+
+    if (!(username && result)) throw 'missing property {username},{result}';
     await Result.create({
-      questions: req.body.questions,
-      answers: req.body.answers,
+      username,
+      result,
+      attempts,
+      point,
+      archieved,
     });
     res.json({ status: 'sucess' });
   } catch (error) {

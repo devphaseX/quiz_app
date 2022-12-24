@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const result = new Schema({
   username: { type: String },
-  results: { type: Array, default: Array.of },
+  result: { type: Object },
   attempts: { type: Number, default: 0 },
   point: { type: Number, default: 0 },
   archieved: { type: String, default: '' },
