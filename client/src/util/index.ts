@@ -1,4 +1,9 @@
-import { AnsweredQuiz, QuestionWithChoosenAnswer } from '../data/type';
+import {
+  AnsweredQuiz,
+  QuestionWithChoosenAnswer,
+  QuestionWithoutChoosenAnswer,
+} from '../data/type';
+import { AttemptableQuestion } from '../store/questions';
 
 interface ExternalFulfilPromise<R> {
   resolve: (result: R) => void;
@@ -52,6 +57,36 @@ const getFlagStatus = (earnedPoint: number, totalPoints: number) => {
   return earnedPoint < (totalPoints * 50) / 100 ? 'failed' : 'passed';
 };
 
+function sortQuestion(
+  questions: AttemptableQuestion[],
+  option: { userId: string }
+) {
+  const anweredQuestions: Array<QuestionWithChoosenAnswer> = [];
+  const leftoutQuestions: Array<QuestionWithoutChoosenAnswer> = [];
+
+  questions.forEach((question) => {
+    if (question.answer) {
+      anweredQuestions.push({ ...question });
+    } else {
+      leftoutQuestions.push(question);
+    }
+  });
+
+  const attempted = anweredQuestions.length;
+
+  return {
+    userInfo: { id: option.userId, username: option.userId },
+    __raw: {
+      questions,
+    },
+    intrepreted: {
+      anweredQuestions,
+      attempted,
+      leftoutQuestions,
+    },
+  };
+}
+
 export type { ExternalFulfilPromise };
 export {
   getExternalFulfillPromise,
@@ -59,4 +94,5 @@ export {
   nanoid,
   calculatePoint,
   getFlagStatus,
+  sortQuestion,
 };

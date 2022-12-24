@@ -1,5 +1,3 @@
-import { nanoid } from '../util';
-
 interface QuizData {
   _id: string;
   questions: Array<QuestionWithUniqueOption>;
